@@ -14,6 +14,7 @@ router
 router
     .route('/trips/:tripCode') // Search param is named tripCode
     .get(tripsController.tripsFindByCode) // Get request returns single trip
-    .put(tripsController.tripsUpdateTrip); // Put requests updates and returns trip
-
+    .put(tripsController.tripsUpdateTrip) // Put requests updates and returns trip
+    .delete(tripsController.tripsDeleteTrip); // Delete requests deletes trip by code
+    
 module.exports = router;
