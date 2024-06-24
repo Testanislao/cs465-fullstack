@@ -1,5 +1,6 @@
 const Mongoose = require('mongoose');
 const Trip = require('../models/travlr');
+const User = require('../models/user');
 const Model = Mongoose.model('trips') // endpoint
 
 // GET: /trips - lists all the trips 
@@ -13,15 +14,11 @@ const tripsList = async (req, res) => {
     // console.log(q);
     if (!q) {
         // no data in database
-        return res
-            .status(404)
-            .json.log(q);
+        return res.status(404).json.log(q);
     }
     else {
         // return resulting list from database
-        return res
-            .status(200)
-            .json(q);
+        return res.status(200).json(q);
     }
 };
 
@@ -29,34 +26,33 @@ const tripsList = async (req, res) => {
 // Regardless of outcome, response must include HTML status code.
 // and JSON message to the req client. 
 const tripsAddTrip = async (req, res) => {
-    const newTrip = new Trip({
-        code: req.body.code,
-        name: req.body.name,
-        length: req.body.length,
-        start: req.body.start,
-        resort: req.body.resort,
-        perPerson: req.body.perPerson,
-        image: req.body.image,
-        description: req.body.description
-    });
-
-    const q = await newTrip.save();
-
-    if (!q) {
-        // database returned no data
-        return res
-            .status(404)
-            .json(err);
-    }
-    else {
-        // return new trip from database
-        return res
-            .status(201)
-            .json(q);
-    }
-
-    // uncomment the following to show results of query
-    // console.log(q);
+    await getUser(req, res,
+        (req, res) => {
+            Trip.create({
+                code: req.body.code,
+                name: req.body.name,
+                length: req.body.length,
+                start: req.body.start,
+                resort: req.body.resort,
+                perPerson: req.body.perPerson,
+                image: req.body.image,
+                description: req.body.description
+            }).then(q => {
+                if (!q) {
+                    // returned no data
+                    return res.status(404).send({
+                        message: "Trip not found with code"
+                    });
+                }
+                // return new trip from database
+                res.status(201).json(q);
+            }).catch(err => {
+                // user not validated. 
+                console.error('error adding trip', err);
+                return res.status(500).json(err);
+            })
+        }
+    )
 };
 
 // GET: /trips/:tripCode - lists a single trip
@@ -70,15 +66,11 @@ const tripsFindByCode = async (req, res) => {
     // console.log(q);
     if (!q) {
         // no data in database
-        return res
-            .status(404)
-            .json.log(q);
+        return res.status(404).json.log(q);
     }
     else {
         // return resulting list from database
-        return res
-            .status(200)
-            .json(q);
+        return res.status(200).json(q);
     }
 };
 
@@ -86,67 +78,92 @@ const tripsFindByCode = async (req, res) => {
 // Regardless of outcome, response must include HTML status code.
 // and JSON message to the req client. 
 const tripsUpdateTrip = async (req, res) => {
-    const q = await Model
-        .findOneAndUpdate(
-            { code: req.params.tripCode },
-            {
-                code: req.body.code,
-                name: req.body.name,
-                length: req.body.length,
-                start: req.body.start,
-                resort: req.body.resort,
-                perPerson: req.body.perPerson,
-                image: req.body.image,
-                description: req.body.description
-            }
-        ).exec();
-
-    if (!q) {
-        // database returned no data
-        return res
-            .status(400)
-            .json(err);
-    }
-    else {
-        // return updated trip from database
-        return res
-            .status(201)
-            .json(q);
-    }
-
-    // uncomment the following to show results of query
-    // console.log(q);
+    await getUser(req, res,
+        (req, res) => {
+            Model.findOneAndUpdate(
+                { code: req.params.tripCode },
+                {
+                    code: req.body.code,
+                    name: req.body.name,
+                    length: req.body.length,
+                    start: req.body.start,
+                    resort: req.body.resort,
+                    perPerson: req.body.perPerson,
+                    image: req.body.image,
+                    description: req.body.description
+                }
+            ).then(q => {
+                if (!q) {
+                    // database returned no data
+                    return res.status(400).send({
+                        message: "Trip not found with code"
+                    });
+                }
+                // return updated trip from database
+                res.status(201).json(q);
+            }).catch(err => {
+                // user not validated. 
+                console.error('error editing trip', err);
+                return res.status(500).json(err);
+            })
+        }
+    )
 };
 
 // DELETE: /trips/:tripCode - delete a trip
 // Regardless of outcome, response must include HTML status code.
 // and JSON message to the req client. 
 const tripsDeleteTrip = async (req, res) => {
-    try {
-    const q = await Model
-        .findOneAndDelete(
-            { code: req.params.tripCode }
-        ).exec();
+    await getUser(req, res,
+        (req, res) => {
+            Model.findOneAndDelete(
+                { code: req.params.tripCode }
+            ).then(q => {
+                if (!q) {
+                    // database returned no data
+                    return res.status(404).send({
+                        message: "Trip not found with code"
+                    });
+                }
+                // return deleted trip from database
+                res.status(200).json(q);
+            }).catch(err => {
+                // user not validated. 
+                console.error('error editing trip', err);
+                return res.status(500).json(err);
+            })
+        }
+    )
+};
 
-    if (!q) {
-        // database returned no data
-        return res
-            .status(404)
-            .json({error: 'trip not found'});
-    }
-    else {
-        // return deleted trip from database
-        return res
-            .status(200)
-            .json(q);
-    }
-}catch (err) {
-    console.error('error deleting trip', err);
-    return res.status(500).json({error: 'internal server error'});
-    }
+// Helper method to validate user credentials. 
+// Finds user in db with email, 
+// if found invokes the callback with (req, res, user.name)
+const getUser = async (req, res, callback) => {
+    if (req.auth && req.auth.email) {
+        try {
+            const user = await User
+                .findOne({
+                    email: req.auth.email
+                })
+                .exec();
 
-    // uncomment the following to show results of query
-    // console.log(q);
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({
+                        message: "User not found"
+                    });
+            }
+            callback(req, res, user.name);
+        } catch (err) {
+            return res
+                .status(404)
+                .json({
+                    message: "User not found"
+                });
+        }
+    }
 };
 
 module.exports = {
