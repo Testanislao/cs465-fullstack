@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { TripDataService } from '../services/trip-data.service';
 import { Trip } from '../models/trip';
+import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
   selector: 'app-edit-trip',
@@ -22,12 +23,14 @@ export class EditTripComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private tripService: TripDataService
+    private tripService: TripDataService,
+    private authenticationService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
     // retrieved stashed trip ID
     let tripCode = localStorage.getItem("tripCode");
+    
     if (!tripCode) {
       alert("Something wrong, couldn’t find where I stashed tripCode!");
       this.router.navigate(['']);
@@ -69,10 +72,11 @@ export class EditTripComponent implements OnInit {
   }
 
   public onSubmit() {
+    let token = this.authenticationService.getToken();
     this.submitted = true;
 
     if (this.editForm.valid) {
-      this.tripService.updateTrip(this.editForm.value)
+      this.tripService.updateTrip(this.editForm.value, token)
         .subscribe({
           next: (data: any) => {
             console.log(data);

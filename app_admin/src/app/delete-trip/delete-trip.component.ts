@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TripDataService } from '../services/trip-data.service';
+import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
   selector: 'app-delete-trip',
@@ -16,12 +17,15 @@ export class DeleteTripComponent implements OnInit{
 
   constructor(
     private router: Router,
-    private tripService: TripDataService
+    private tripService: TripDataService,
+    private authenticationService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
     // retrieved stashed trip ID
+    let token = this.authenticationService.getToken();
     let tripCode = localStorage.getItem("tripCode");
+
     if (!tripCode) {
       alert("Something wrong, couldn’t find where I stashed tripCode!");
       this.router.navigate(['']);
@@ -30,7 +34,7 @@ export class DeleteTripComponent implements OnInit{
     console.log('DeleteTripComponent::ngOnInit');
     console.log('tripcode:' + tripCode);
 
-    this.tripService.deleteTrip(tripCode)
+    this.tripService.deleteTrip(tripCode, token)
     .subscribe({
       next: (data: any) => {
         console.log(data);
