@@ -80,7 +80,7 @@ export class EditTripComponent implements OnInit {
         .subscribe({
           next: (data: any) => {
             console.log(data);
-            this.router.navigate(['']);
+            this.router.navigate(['list-trip']);
           },
           error: (error: any) => {
             console.log('Error: ' + error);
