@@ -1,26 +1,9 @@
+/*
+
 const Mongoose = require('mongoose');
 const Trip = require('../models/travlr');
 const User = require('../models/user');
 const Model = Mongoose.model('trips') // endpoint
-
-/**
- * 
- * Had to refractor methods to async functions 
- * that used promises. 
- * Awaits the get user function, 
- * returns a callback, 
- * continues with the promise (req, res) 
- * for each Post, Put, Delete. 
- * .then and .catch for resolution/rejection of promise. 
- * 
- * Tried to use multiple await functions 
- * with try/catch blocks. 
- * Ended up having issues with multiple return statements 
- * and .json header responses. 
- * The db manipulations worked but the status codes and 
- * error handling was messed up.
- * 
- */
 
 // GET: /trips - lists all the trips 
 // Regardless of outcome, response must include HTML status code.
@@ -192,3 +175,5 @@ module.exports = {
     tripsUpdateTrip,
     tripsDeleteTrip
 };
+
+*/

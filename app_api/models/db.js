@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const host = process.env.DB_HOST || '127.0.0.1';
-const dbURI = `mongodb://${host}/travlr`;
+const dbURI = `mongodb://${host}/rrn`;
 const readLine = require('readline');
 // Build the connection string and set the connection timeout.
 // timeout is in milliseconds.
@@ -53,5 +53,5 @@ process.on('SIGTERM', () => {
 // Make initial connection to DB
 connect();
 // Import Mongoose schema
-require('./travlr');
+require('./rrn');
 module.exports = mongoose;

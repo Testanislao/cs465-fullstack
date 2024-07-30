@@ -8,7 +8,8 @@ const auth = jwt({
 });
 
 // Import controllers
-const tripsController = require('../controllers/trips');
+const novelsController = require('../controllers/novels');
+const listsController = require('../controllers/lists');
 const authController = require('../controllers/authentication');
 
 // define route for /login endpoint
@@ -21,17 +22,29 @@ router
     .route('/register')
     .post(authController.register);
 
-// define route for /trips endpoint
+// define route for /novels endpoint
 router
-    .route('/trips')
-    .get(tripsController.tripsList) // Get request
-    .post(auth, tripsController.tripsAddTrip); // Post request to add Trip to DB
+.route('/novels')
+.get(novelsController.novelsList); // Get request
 
 // define search by param request
 router
-    .route('/trips/:tripCode') // Search param is named tripCode
-    .get(tripsController.tripsFindByCode) // Get request returns single trip
-    .put(auth, tripsController.tripsUpdateTrip) // Put requests updates and returns trip
-    .delete(auth, tripsController.tripsDeleteTrip); // Delete requests deletes trip by code
+    .route('/novels/:id') // Search param is named tripCode
+    .get(novelsController.novelsFindById) // Get request returns single trip
 
+/*
+// define route for /lists endpoint
+router
+    .route('/lists')
+    .get(listsController.userList) // Get request
+    .post(auth, listsController.userAddNovel); // Post request to add Trip to DB
+
+// define search by param request
+router
+    .route('/lists/:novelTitle') // Search param is named tripCode
+    .get(listsController.userFindByTitle) // Get request returns single trip
+    .put(auth, listsController.userUpdateTitle) // Put requests updates and returns trip
+    .delete(auth, listsController.userDeleteTitle); // Delete requests deletes trip by code
+
+    */
 module.exports = router;
