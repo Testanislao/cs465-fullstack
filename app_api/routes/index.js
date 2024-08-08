@@ -22,29 +22,36 @@ router
     .route('/register')
     .post(authController.register);
 
-// define route for /novels endpoint
+/* 
+ * /novels endpoint should be a public Get endpoint, 
+ * for accessing both single novels and list of all novels.
+ */
+
+//define route for /novels endpoint
 router
-.route('/novels')
-.get(novelsController.novelsList); // Get request
+    .route('/novels')
+    .get(novelsController.novelsList); // Get request for JSON off all novels in DB
 
 // define search by param request
 router
-    .route('/novels/:id') // Search param is named tripCode
-    .get(novelsController.novelsFindById) // Get request returns single trip
+    .route('/novels/:id') // Search param is default MongoDB _id
+    .get(novelsController.novelsFindById); // Get request returns single novel 
 
-/*
+/* 
+ * /lists endpoint should be a "private" endpoint, 
+ * for accessing unique user list and modifying it. 
+ */
+
+
 // define route for /lists endpoint
 router
     .route('/lists')
-    .get(listsController.userList) // Get request
-    .post(auth, listsController.userAddNovel); // Post request to add Trip to DB
+    .get(auth, listsController.userList); // Get request returns user list
 
 // define search by param request
 router
-    .route('/lists/:novelTitle') // Search param is named tripCode
-    .get(listsController.userFindByTitle) // Get request returns single trip
-    .put(auth, listsController.userUpdateTitle) // Put requests updates and returns trip
-    .delete(auth, listsController.userDeleteTitle); // Delete requests deletes trip by code
-
-    */
+    .route('/lists/:id') // Search param is default MongoDB _id
+    .post(auth, listsController.userAddNovel) // Post request to add novel to user list
+    .delete(auth, listsController.userDeleteNovel); // Delete requests deletes novel by id
+    
 module.exports = router;

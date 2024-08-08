@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-// Define the trip schema
+
+// Define the novel schema
 const novelSchema = new mongoose.Schema({
     Title: { type: String, required: true, index: true },
     Link: { type: String, required: false },
@@ -13,5 +14,5 @@ const novelSchema = new mongoose.Schema({
         LastUpdated: { type: Date, required: false }
     }
 });
-const Novel = mongoose.model('Novel', novelSchema);
+const Novel = mongoose.model('novels', novelSchema);
 module.exports = Novel;
