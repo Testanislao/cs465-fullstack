@@ -50,8 +50,9 @@ router
 
 // define search by param request
 router
-    .route('/lists/:id') // Search param is default MongoDB _id
+    .route('/lists/:id') // Search param is default MongoDB _id for the novel
     .post(auth, listsController.userAddNovel) // Post request to add novel to user list
+    .put(auth, listsController.userUpdateNovel) // Put request updates novel in user list 
     .delete(auth, listsController.userDeleteNovel); // Delete requests deletes novel by id
     
 module.exports = router;
