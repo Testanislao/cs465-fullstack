@@ -23,11 +23,21 @@ router
     .post(authController.register);
 
 /* 
+ * /novels/search endpoint should be a public Get endpoint, 
+ * for querying the database with custom queries.
+ */
+
+// define route for /novels/search endpoint
+router
+    .route('/novels/search')
+    .get(novelsController.novelsSearch); // Get request for custom query
+
+/* 
  * /novels endpoint should be a public Get endpoint, 
  * for accessing both single novels and list of all novels.
  */
 
-//define route for /novels endpoint
+// define route for /novels endpoint
 router
     .route('/novels')
     .get(novelsController.novelsList); // Get request for JSON off all novels in DB
@@ -41,7 +51,6 @@ router
  * /lists endpoint should be a "private" endpoint, 
  * for accessing unique user list and modifying it. 
  */
-
 
 // define route for /lists endpoint
 router

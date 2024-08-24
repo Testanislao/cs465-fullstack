@@ -44,7 +44,39 @@ const novelsFindById = async (req, res) => {
     }
 };
 
+/* 
+ * GET: /novels/search - returns novels collection query
+ * Regardless of outcome, response must include HTML status code.
+ * and JSON message to the req client. 
+ */
+const novelsSearch = async (req, res) => {
+    try {
+        const { title, tag, sortBy = 'Title', sortOrder = 'asc', limit = 10 } = req.query;      
+        const q = {};
+
+        if (title) {
+            // if title exists in the query, change it to case insensitive
+            q.Title = new RegExp(title, 'i');
+        }
+        if (tag) {
+            q.Tags = tag;
+        }
+
+        // validate sorting params
+        const validParams = ['Title', 'Stats.Followers', 'Stats.Rating', 'Stats.Pages', 'Stats.Views', 'Stats.Chapters', 'Stats.Last Updated'];
+        const sortField = validParams.includes(sortBy) ? sortBy : 'Title';
+        const sortOrderValue = sortOrder === 'desc' ? -1 : 1;
+
+        const novels = await Model.find(q).sort({[sortField] : sortOrderValue }).limit(parseInt(limit)).exec();
+        return res.status(200).json(novels);
+    } catch (err) {
+        console.error('error searching novels', err);
+        return res.status(500).json(err);
+    }
+};
+
 module.exports = {
     novelsList,
-    novelsFindById
+    novelsFindById,
+    novelsSearch
 };
